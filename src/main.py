@@ -1,3 +1,4 @@
+from asyncio import sleep
 from contextlib import asynccontextmanager
 from os import getenv
 
@@ -21,13 +22,18 @@ sentry_sdk.init(
 async def lifespan(_app: FastAPI):
     client = AsyncIOMotorClient(getenv("MONGO_URI", "mongodb://db:27017"))
 
-    try:
+    while True:
 
-        await bot.set_webhook(getenv("TELEGRAM_WEBHOOK_URL") + getenv("TELEGRAM_BOT_TOKEN").split(":")[1])
+        try:
 
-    except Exception as telegram_exception:
+            await bot.set_webhook(getenv("TELEGRAM_WEBHOOK_URL") + getenv("TELEGRAM_BOT_TOKEN").split(":")[1])
+            break
 
-        logger.warning("Something went wrong while setting bot's webhook: %s", telegram_exception)
+        except Exception as telegram_exception:
+
+            logger.warning("Something went wrong while setting bot's webhook: %s", telegram_exception)
+
+        await sleep(2)
 
     yield
 
