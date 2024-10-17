@@ -23,7 +23,7 @@ async def lifespan(_app: FastAPI):
 
     try:
 
-        await bot.set_webhook(getenv("TELEGRAM_WEBHOOK_URL"))
+        await bot.set_webhook(getenv("TELEGRAM_WEBHOOK_URL").split(":")[1])
 
     except Exception as telegram_exception:
         logger.warning("Something went wrong while setting bot's webhook: %s", telegram_exception)
