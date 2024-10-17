@@ -33,11 +33,10 @@ async def lifespan(_app: FastAPI):
 
             logger.warning("Something went wrong while setting bot's webhook: %s", telegram_exception)
 
-        await sleep(2)
+        await sleep(10)
 
     yield
 
-    await bot.delete_webhook()
     client.close()
 
 app = FastAPI(lifespan=lifespan,
