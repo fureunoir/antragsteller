@@ -1,0 +1,66 @@
+services:
+  app:
+    restart: always
+    build: .
+    command: >
+      sh -c "if [ \"$DEBUG\" = \"1\" ]; then
+               poetry run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload --log-level debug;
+             else
+               poetry run uvicorn src.main:app --host 0.0.0.0 --port 8000 --workers 5 --log-level warning;
+             fi"
+    volumes:
+      - .:/app
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+    shm_size: '2gb'
+
+  db:
+    restart: always
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./services_data/mongo:/data/db
+    env_file:
+      - .env
+    shm_size: '2gb'
+
+  worker:
+    restart: always
+    build: .
+    command: sh -c "poetry run celery -A src.celery worker --loglevel=info --autoscale=10,3"
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - app
+      - redis
+
+  beat:
+    restart: always
+    build: .
+    command: sh -c "poetry run celery -A src.celery beat -l info"
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - worker
+
+  redis:
+    restart: always
+    image: redis:latest
+    volumes:
+      - ./services_data/redis:/data
+    ports:
+      - "6379:6379"

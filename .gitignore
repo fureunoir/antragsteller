@@ -1,0 +1,5 @@
+services_data
+.env
+.idea
+project-tree.txt
+celerybeat-schedule

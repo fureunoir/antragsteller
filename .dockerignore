@@ -1,0 +1,6 @@
+Dockerfile
+docker-compose.yml
+.env
+LICENSE
+project-tree.txt
+services_data
