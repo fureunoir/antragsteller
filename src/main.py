@@ -23,16 +23,6 @@ sentry_sdk.init(
 async def lifespan(_app: FastAPI):
     client = AsyncIOMotorClient(getenv("MONGO_URI", "mongodb://db:27017"))
 
-    try:
-
-        await bot.set_webhook(getenv("TELEGRAM_WEBHOOK_URL") + getenv("TELEGRAM_BOT_TOKEN").split(":")[1])
-
-    except Exception as telegram_exception:
-
-        capture_exception(telegram_exception)
-
-        logger.warning("Something went wrong while setting bot's webhook: %s", telegram_exception)
-
     yield
 
     client.close()
