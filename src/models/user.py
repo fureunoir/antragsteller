@@ -9,7 +9,7 @@ class UserModel(BaseModel):
     is_active: bool = Field(True, description="Is the user active (not banned)")
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "telegram_id": 123456789,
                 "first_name": "John",
