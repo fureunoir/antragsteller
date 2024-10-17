@@ -6,9 +6,11 @@ from aiogram.types import Update
 from src.handlers import router
 from src.helpers.bot import handle_message
 
-url_part = getenv("TELEGRAM_BOT_TOKEN").split(":")[1]
+verify = getenv("TELEGRAM_BOT_TOKEN").split(":")[1]
 
-@router.post(f"/webhook/{url_part}", include_in_schema=False)
-async def telegram_webhook(update: Update):
+@router.post("/webhook/{url_part}", include_in_schema=False)
+async def telegram_webhook(url_part: str, update: Update):
+    if not url_part == verify:
+        return {"status": "get outta here"}
     create_task(handle_message(update))
     return {"status": "ok"}
