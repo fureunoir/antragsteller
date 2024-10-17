@@ -21,7 +21,7 @@ async def get_users_collection():
     return db.get_collection("users")
 
 # Route to get all users
-@router.get("/users", response_description="List all users", response_model=List[UserModel])
+@router.get("/users", response_description="List all users", response_model=List[UserModel] | dict)
 async def get_users(admin_key: str, users_collection=Depends(get_users_collection)):
     if admin_key != getenv("ADMIN_KEY"):
         return {"msg": "FUCK OFF"}
@@ -30,7 +30,7 @@ async def get_users(admin_key: str, users_collection=Depends(get_users_collectio
 
 
 # Route to add a user
-@router.post("/users", response_description="Add new user", response_model=UserModel)
+@router.post("/users", response_description="Add new user", response_model=UserModel | dict)
 async def create_user(admin_key: str, user: UserModel, users_collection=Depends(get_users_collection)):
     if admin_key != getenv("ADMIN_KEY"):
         return {"msg": "FUCK OFF"}
@@ -41,7 +41,7 @@ async def create_user(admin_key: str, user: UserModel, users_collection=Depends(
     return new_user
 
 # Route to get a user by telegram_id
-@router.get("/users/{telegram_id}", response_description="Get a user by Telegram ID", response_model=UserModel)
+@router.get("/users/{telegram_id}", response_description="Get a user by Telegram ID", response_model=UserModel | dict)
 async def get_user(admin_key: str, telegram_id: int, users_collection=Depends(get_users_collection)):
     if admin_key != getenv("ADMIN_KEY"):
         return {"msg": "FUCK OFF"}
@@ -51,7 +51,7 @@ async def get_user(admin_key: str, telegram_id: int, users_collection=Depends(ge
     raise HTTPException(status_code=404, detail="User not found")
 
 # Route to update a user
-@router.put("/users/{telegram_id}", response_description="Update a user", response_model=UserModel)
+@router.put("/users/{telegram_id}", response_description="Update a user", response_model=UserModel | dict)
 async def update_user_data(admin_key: str, telegram_id: int, data: UserModel, users_collection=Depends(get_users_collection)):
     if admin_key != getenv("ADMIN_KEY"):
         return {"msg": "FUCK OFF"}

@@ -9,6 +9,7 @@ from starlette.responses import RedirectResponse
 
 from src.bot import bot
 from src.handlers import router
+from src.logging import logger
 
 sentry_sdk.init(
     dsn=getenv("SENTRY_DSN"),
@@ -20,7 +21,12 @@ sentry_sdk.init(
 async def lifespan(_app: FastAPI):
     client = AsyncIOMotorClient(getenv("MONGO_URI", "mongodb://db:27017"))
 
-    await bot.set_webhook(getenv("TELEGRAM_WEBHOOK_URL"))
+    try:
+
+        await bot.set_webhook(getenv("TELEGRAM_WEBHOOK_URL"))
+
+    except Exception as telegram_exception:
+        logger.warning("Something went wrong while setting bot's webhook: %s", telegram_exception)
 
     yield
 
