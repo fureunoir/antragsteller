@@ -5,6 +5,7 @@ from os import getenv
 import sentry_sdk
 from fastapi import FastAPI
 from motor.motor_asyncio import AsyncIOMotorClient
+from sentry_sdk import capture_exception
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from starlette.responses import RedirectResponse
 
@@ -22,18 +23,15 @@ sentry_sdk.init(
 async def lifespan(_app: FastAPI):
     client = AsyncIOMotorClient(getenv("MONGO_URI", "mongodb://db:27017"))
 
-    while True:
+    try:
 
-        try:
+        await bot.set_webhook(getenv("TELEGRAM_WEBHOOK_URL") + getenv("TELEGRAM_BOT_TOKEN").split(":")[1])
 
-            await bot.set_webhook(getenv("TELEGRAM_WEBHOOK_URL") + getenv("TELEGRAM_BOT_TOKEN").split(":")[1])
-            break
+    except Exception as telegram_exception:
 
-        except Exception as telegram_exception:
+        capture_exception(telegram_exception)
 
-            logger.warning("Something went wrong while setting bot's webhook: %s", telegram_exception)
-
-        await sleep(10)
+        logger.warning("Something went wrong while setting bot's webhook: %s", telegram_exception)
 
     yield
 
